@@ -10,8 +10,15 @@ from tkinter import Y
 
 
 class Player:
-    name=''
+    
     lang =''
+    
+    def __init__ (self):
+        print("Введите язык/Enter your lang. (рус\eng)")
+        self.lang = input();
+         
+        
+        
 
 class Print:
 
@@ -211,7 +218,7 @@ class Sravnenie:
 #word=input()
 #print(word)
 #hide = HangManForRusPlayer.hide_word(word)
-class HangmanGuessing:
+class HangmanGuessingRus:
     def Guess(hide1):    
         hide=[None]*len(hide1)
         for i in range(len(hide1)):
@@ -237,6 +244,9 @@ class HangmanGuessing:
             if len(setword)==1:
                 print(setword.pop())
                 break
+            elif len(setword)==0:
+                print("Такого слова нет в словаре(")
+                break
             else:
                # print(setword)
                 for x in setword:
@@ -245,7 +255,7 @@ class HangmanGuessing:
                         ind=random.randint(0,len(x)-1)
                         if hide[ind]=='_':
                             break
-                    print('у вас есть ?')
+                    print('В слове есть такая буква? (напишите д/н)')
                     print(x[ind])
                     answer=''
                     answer=input()
@@ -259,14 +269,64 @@ class HangmanGuessing:
                             print('Бездушная машина не смогла отгадать слово')
                             break
                # print(hide)
-
+class HangmanGuessingEng:
+    def Guess(hide1):    
+        hide=[None]*len(hide1)
+        for i in range(len(hide1)):
+            #  print(i)
+            hide[i]=hide1[i]
+        #print(hide)     
+        with open('english_nouns.txt', encoding='utf-8') as f:
+            lines = f.read().splitlines()
+        setword=set()
+        #print(1);
+        max=0
+        min=0
+        countOfErrors=0
+        while (countOfErrors<6):
+            for wrds in lines:
+                if len(wrds)==len(hide) and Sravnenie.chek(hide,wrds):
+                    if fuzz.ratio(hide,wrds)>max:
+                        setword=set()
+                        setword.add(wrds)
+                        min=distance(wrds,hide)
+                        max =fuzz.ratio(hide,wrds)
+                    if fuzz.ratio(hide,wrds)==max:
+                        setword.add(wrds)
+            if len(setword)==1:
+                print(setword.pop())
+                break
+            elif len(setword)==0:
+                print("There is no a such word in library(")
+                break
+            else:
+               # print(setword)
+                for x in setword:
+                   # print(x)
+                    while(True):
+                        ind=random.randint(0,len(x)-1)
+                        if hide[ind]=='_':
+                            break
+                    print('Is there such a letter in the word? (Enter y/n)')
+                    print(x[ind])
+                    answer=''
+                    answer=input()
+                    if (answer == 'y'):
+                        hide[ind]=x[ind]
+                        break
+                    else:
+                        countOfErrors=countOfErrors+1
+                        Print.hang(countOfErrors)
+                        if countOfErrors==6:
+                            print('The soulless machine could not guess the word')
+                            break
         
 
 
 
 N = Player()
-print('Введите язык(Enter your lang (рус\eng)')
-N.lang = input()
+#print('Введите язык(Enter your lang (рус\eng)')
+#N.lang = input()
 while (N.lang != 'рус'  and N.lang != 'eng'):
     print('Неверный ввод языка(Lang error)')
     N.lang = input()
@@ -274,31 +334,41 @@ refresh = 'д'
 functoin=''
 while (refresh == 'д' or refresh == 'y'):
     if (N.lang == 'рус'):
-        print("Игрок играет на языке " + N.lang)
+        print("Выбрана игра на русском")
         print('отгадать слово или загадать? введие о\з')
         function=input()
         if function == 'о':
             word = HangManForRusPlayer.rand_word()
             hide = HangManForRusPlayer.hide_word(word)
-            count =0
-            for  i in range(len(hide)):
-                if hide[i]=='_':
-                    count+=1  
+           # count =0
+           # for  i in range(len(hide)):
+            #    if hide[i]=='_':
+             #       count+=1  
             #print(len(hide)len(hide) - count)
             HangManForRusPlayer.process_of_game(word,hide)
         elif function =='з':
             print('введите скрытые элементы с помощью _. Прмер ввода - c_о_о (слово).')
             hide=input()
-            HangmanGuessing.Guess(hide)
+            HangmanGuessingRus.Guess(hide)
         print('Хотите продолжить? (д/н)')
         refresh = input()
     elif (N.lang == 'eng'):
-        print("Player play in " + N.lang)
-        word = HangManForEngPlayer.rand_word()
-    #print(word)
-        hide = HangManForEngPlayer.hide_word(word)
-    #print(hide)
-        HangManForEngPlayer.process_of_game(word,hide)
+        print("Plying in english")
+        print('guess a word or make a guess? enter o\m')
+        function=input()
+        if function == 'o':
+            word = HangManForEngPlayer.rand_word()
+            hide = HangManForEngPlayer.hide_word(word)
+           # count =0
+           # for  i in range(len(hide)):
+            #    if hide[i]=='_':
+             #       count+=1  
+            #print(len(hide)len(hide) - count)
+            HangManForEngPlayer.process_of_game(word,hide)
+        elif function =='m':
+            print('Enter the hidden elements using _. An example of input is w_rd (word).')
+            hide=input()
+            HangmanGuessingEng.Guess(hide)
         print('Want countinue? (y/n)')
         refresh = input()
 
